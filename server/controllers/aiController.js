@@ -1,9 +1,9 @@
-import openai  from '../config/openai.js';
+import huggingfaceClient from '../config/huggingface.js'; // Your HF axios client
 
 const createPrompt = (action, code, targetLang = '') => {
   switch (action) {
     case 'analyze':
-      return `You are a code quality reviewer. Analyze the following code and provide feedback on structure, readability, performance, and best practices.\n\n${code}`;
+      return `Analyze the following code and provide feedback on structure, readability, performance, and best practices.\n\n${code}`;
     case 'explain':
       return `Explain the following code in detail as if teaching a beginner:\n\n${code}`;
     case 'translate':
@@ -25,18 +25,19 @@ const handleAIRequest = async (req, res) => {
 
     const prompt = createPrompt(action, code, targetLang);
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4',
-      messages: [
-        { role: 'system', content: 'You are a helpful programming assistant.' },
-        { role: 'user', content: prompt }
-      ]
+    // Call DeepSeek V3 via HuggingFace Inference API
+    const response = await huggingfaceClient.post('', {
+      inputs: prompt,
     });
 
-    const result = completion.choices[0].message.content;
-    res.status(200).json({ success: true, result });
+    // HuggingFace usually returns an array of results
+    // Adjust this based on actual response shape
+    const output = response.data[0]?.generated_text || 'No output from model';
+
+    res.status(200).json({ success: true, result: output });
 
   } catch (error) {
+    console.error('HuggingFace error:', error.response?.data || error.message);
     res.status(500).json({ success: false, error: error.message });
   }
 };

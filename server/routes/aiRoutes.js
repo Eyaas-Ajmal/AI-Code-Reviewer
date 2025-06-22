@@ -1,8 +1,8 @@
 import express from 'express';
-import  handleAIRequest  from '../controllers/aiController.js';
+import handleAIRequest  from '../controllers/aiController.js';
 
 const router = express.Router();
 
-router.post('/:action', handleAIRequest);
+router.post('/', handleAIRequest);
 
 export default router;
