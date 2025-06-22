@@ -1,4 +1,4 @@
-import { openai } from '../config/openai.js';
+import openai  from '../config/openai.js';
 
 const createPrompt = (action, code, targetLang = '') => {
   switch (action) {
